@@ -38,6 +38,16 @@ describe('calculateItemTotal', () => {
             const breadTotal = calculateItemTotal(bread);
             expect(breadTotal).toBeCloseTo(-11.56);
         })
+        it('should correctly calculate if quantity is a negative value', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: 5.78,
+                quantity: -2
+            }
+            const breadTotal = calculateItemTotal(bread);
+            expect(breadTotal).toBeCloseTo(-11.56);
+        })
         it('should correctly calculate if quantity and price zero value', () => {
             const bread: CartItem = {
                 id: 1,
@@ -47,6 +57,16 @@ describe('calculateItemTotal', () => {
             }
             const breadTotal = calculateItemTotal(bread);
             expect(breadTotal).toEqual(0.00);
+        })
+        it('should correctly calculate if quantity and price negative values', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: -5.78,
+                quantity: -2
+            }
+            const breadTotal = calculateItemTotal(bread);
+            expect(breadTotal).toEqual(11.56);
         })
         it('should correctly calculate large values', () => {
             const bread: CartItem = {
@@ -150,6 +170,40 @@ describe('calculateSubtotal', () => {
             const subtotal = calculateSubtotal(items);
             expect(subtotal).toBeCloseTo(-47.81)
         })
+        it('should handle when one quantity is a negative value', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: 5.78,
+                quantity: 2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 7.25,
+                quantity: -5
+            }
+            const items: CartItem[] = [bread, paper];
+            const subtotal = calculateSubtotal(items);
+            expect(subtotal).toBeCloseTo(-24.69)
+        })
+        it('should handle when quantities are negative values', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: 5.78,
+                quantity: -2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 7.25,
+                quantity: -5
+            }
+            const items: CartItem[] = [bread, paper];
+            const subtotal = calculateSubtotal(items);
+            expect(subtotal).toBeCloseTo(-47.81)
+        })
     });
 });
 
@@ -210,4 +264,153 @@ describe('calculateDiscount', () => {
             expect(discount).toBeCloseTo(0.00)
         })
     });
+    describe('Edge Cases', () => {
+        it('should correctly calculate discount if items prices are zero', () => {
+            const book: CartItem = {
+                id: 1,
+                name: 'Book',
+                price: 0.00,
+                quantity: 2
+            }
+            const tv: CartItem = {
+                id: 1,
+                name: 'TV',
+                price: 0.00,
+                quantity: 1
+            }
+            const items: CartItem[] = [book,tv];
+            const subtotal = calculateSubtotal(items);
+            const discount = calculateDiscount(subtotal); 
+            expect (discount).toBeCloseTo(0.00) 
+        })
+        it('should correctly calculate large values', () => {
+            const book: CartItem = {
+                id: 1,
+                name: 'Book',
+                price: 50.55,
+                quantity: 1000
+            }
+            const tv: CartItem = {
+                id: 1,
+                name: 'TV',
+                price: 675.25,
+                quantity: 600
+            }
+            const items: CartItem[] = [book, tv];
+            const subtotal = calculateSubtotal(items);
+            const discount = calculateDiscount(subtotal);
+            expect(discount).toBeCloseTo(45570.00)
+        })
+        it('should calculate if price is a negative value', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: -5.78,
+                quantity: 2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 7.25,
+                quantity: 5
+            }
+            const items: CartItem[] = [bread, paper];
+            const subtotal = calculateSubtotal(items);
+            const discount = calculateDiscount(subtotal);
+            expect(discount).toBeCloseTo(0.00)
+        })
+        it('should calculate if quantity is a negative value', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: 5.78,
+                quantity: -2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 7.25,
+                quantity: 5
+            }
+            const items: CartItem[] = [bread, paper];
+            const subtotal = calculateSubtotal(items);
+            const discount = calculateDiscount(subtotal);
+            expect(discount).toBeCloseTo(0.00)
+        })
+    });
+    describe('Boundary conditions', () => {
+        it('should give 10% discount for items that are exactly $100', () => {
+            const book: CartItem = {
+                id: 1,
+                name: 'Book',
+                price: 10.00,
+                quantity: 5
+            }
+            const tv: CartItem = {
+                id: 1,
+                name: 'TV',
+                price: 10.00,
+                quantity: 5
+            }
+            const items: CartItem[] = [book, tv];
+            const subtotal = calculateSubtotal(items);
+            const discount = calculateDiscount(subtotal);
+            expect(discount).toBeCloseTo(10.00)
+        })
+        it('should give 5% discount for items that are exactly $50', () => {
+            const book: CartItem = {
+                id: 1,
+                name: 'Book',
+                price: 10.00,
+                quantity: 2
+            }
+            const tv: CartItem = {
+                id: 1,
+                name: 'TV',
+                price: 10.00,
+                quantity: 3
+            }
+            const items: CartItem[] = [book, tv];
+            const subtotal = calculateSubtotal(items);
+            const discount = calculateDiscount(subtotal);
+            expect(discount).toBeCloseTo(2.50)
+        })
+        it('should give 5% discount for items that are $51', () => {
+            const book: CartItem = {
+                id: 1,
+                name: 'Book',
+                price: 1.00,
+                quantity: 1
+            }
+            const tv: CartItem = {
+                id: 1,
+                name: 'TV',
+                price: 10.00,
+                quantity: 5
+            }
+            const items: CartItem[] = [book, tv];
+            const subtotal = calculateSubtotal(items);
+            const discount = calculateDiscount(subtotal);
+            expect(discount).toBeCloseTo(2.55)
+        })
+        it('should give 5% discount for items that are $101', () => {
+            const book: CartItem = {
+                id: 1,
+                name: 'Book',
+                price: 10.00,
+                quantity: 10
+            }
+            const tv: CartItem = {
+                id: 1,
+                name: 'TV',
+                price: 1.00,
+                quantity: 1
+            }
+            const items: CartItem[] = [book, tv];
+            const subtotal = calculateSubtotal(items);
+            const discount = calculateDiscount(subtotal);
+            expect(discount).toBeCloseTo(10.10)
+        })
+    });
 });
+
