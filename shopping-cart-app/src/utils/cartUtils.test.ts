@@ -592,3 +592,110 @@ describe('calculateTax', () => {
     });
 });
 
+describe('calculateTotal', () => {
+    describe('Normal Cases', () => {
+        it('should calculate total price with 10% discount', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: 50.78,
+                quantity: 2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 7.25,
+                quantity: 5
+            }
+            const items: CartItem[] = [bread, paper]
+            const subtotal = calculateSubtotal(items)
+            const discount = calculateDiscount(subtotal)
+            const afterDiscount = subtotal - discount
+            const tax = calculateTax(afterDiscount)
+            expect(afterDiscount + tax).toBeCloseTo(133.95132)
+        })
+        it('should calculate total price with 5% discount', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: 15.78,
+                quantity: 2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 7.25,
+                quantity: 3
+            }
+            const items: CartItem[] = [bread, paper]
+            const subtotal = calculateSubtotal(items)
+            const discount = calculateDiscount(subtotal)
+            const afterDiscount = subtotal - discount
+            const tax = calculateTax(afterDiscount)
+            expect(afterDiscount + tax).toBeCloseTo(54.69606) 
+        })
+        it('should calculate total price with no discount', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: 5.78,
+                quantity: 2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 7.25,
+                quantity: 5
+            }
+            const items: CartItem[] = [bread, paper]
+            const subtotal = calculateSubtotal(items)
+            const discount = calculateDiscount(subtotal)
+            const afterDiscount = subtotal - discount
+            const tax = calculateTax(afterDiscount)
+            expect(afterDiscount + tax).toBeCloseTo(51.6348)
+        })
+    });
+    describe('Edge Cases', () => {
+        it('should calculate when price is zero', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: 0.00,
+                quantity: 2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 7.25,
+                quantity: 5
+            }
+            const items: CartItem[] = [bread, paper]
+            const subtotal = calculateSubtotal(items)
+            const discount = calculateDiscount(subtotal)
+            const afterDiscount = subtotal - discount
+            const tax = calculateTax(afterDiscount)
+            expect(afterDiscount + tax).toBeCloseTo(39.15)
+        })
+        it('should calculate total price is negative', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: -5.78,
+                quantity: 2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 7.25,
+                quantity: 5
+            }
+            const items: CartItem[] = [bread, paper]
+            const subtotal = calculateSubtotal(items)
+            const discount = calculateDiscount(subtotal)
+            const afterDiscount = subtotal - discount
+            const tax = calculateTax(afterDiscount)
+            expect(afterDiscount + tax).toBeCloseTo(26.6652)
+        })
+    });
+});
+
