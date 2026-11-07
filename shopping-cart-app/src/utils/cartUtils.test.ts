@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {calculateItemTotal, type CartItem, calculateSubtotal, isValidQuantity } from '../utils/cartUtils'
+import {calculateItemTotal, type CartItem, calculateSubtotal, isValidQuantity, calculateDiscount } from '../utils/cartUtils'
 
 describe('calculateItemTotal', () => {
     // Normal Cases 
@@ -153,3 +153,61 @@ describe('calculateSubtotal', () => {
     });
 });
 
+describe('calculateDiscount', () => {
+    describe('Normal Cases', () => {
+        it('should correctly calculate 10% discount', () => {
+            const book: CartItem = {
+                id: 1,
+                name: 'Book',
+                price: 25.05,
+                quantity: 2
+            }
+            const tv: CartItem = {
+                id: 1,
+                name: 'TV',
+                price: 350.00,
+                quantity: 1
+            }
+            const items: CartItem[] = [book,tv];
+            const subtotal = calculateSubtotal(items);
+            const discount = calculateDiscount(subtotal); 
+            expect (discount).toBeCloseTo(40.01)
+        })
+        it('should correctly calculate 5% discount', () => {
+            const book: CartItem = {
+                id: 1,
+                name: 'Book',
+                price: 5.00,
+                quantity: 3
+            }
+            const tv: CartItem = {
+                id: 1,
+                name: 'TV',
+                price: 40.00,
+                quantity: 1
+            }
+            const items: CartItem[] = [book, tv];
+            const subtotal = calculateSubtotal(items);
+            const discount = calculateDiscount(subtotal);
+            expect(discount).toBeCloseTo(2.75)
+        })
+        it('should calculate items that meet no discount requirements', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: 5.78,
+                quantity: 2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 7.25,
+                quantity: 5
+            }
+            const items: CartItem[] = [bread,paper];
+            const subtotal = calculateSubtotal(items);
+            const discount = calculateDiscount(subtotal);
+            expect(discount).toBeCloseTo(0.00)
+        })
+    });
+});
