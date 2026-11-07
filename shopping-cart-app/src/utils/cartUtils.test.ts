@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {calculateItemTotal, type CartItem, calculateSubtotal } from '../utils/cartUtils'
+import {calculateItemTotal, type CartItem, calculateSubtotal, isValidQuantity } from '../utils/cartUtils'
 
 describe('calculateItemTotal', () => {
     // Normal Cases 
@@ -28,17 +28,6 @@ describe('calculateItemTotal', () => {
             const breadTotal = calculateItemTotal(bread);
             expect(breadTotal).toBe(0.00);
         })
-
-        it('should correctly calculate if quantity zero value', () =>{
-            const bread: CartItem = {
-                id: 1,
-                name: 'Bread',
-                price: 5.78,
-                quantity: 0
-            }
-            const breadTotal = calculateItemTotal(bread);
-            expect(breadTotal).toBe(0.00);
-        })
         it('should correctly calculate if price negative value', () => {
             const bread: CartItem = {
                 id: 1,
@@ -57,7 +46,7 @@ describe('calculateItemTotal', () => {
                 quantity: 0
             }
             const breadTotal = calculateItemTotal(bread);
-            expect(breadTotal).toBe(0.00);
+            expect(breadTotal).toEqual(0.00);
         })
         it('should correctly calculate large values', () => {
             const bread: CartItem = {
@@ -91,7 +80,76 @@ describe('calculateSubtotal', () => {
             const subtotal = calculateSubtotal(items);
             expect(subtotal).toBeCloseTo(47.81)
         })
-
-
+    });
+    describe('Edge Cases', () => {
+        it('should handle when prices are zero', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: 0.00,
+                quantity: 2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 0.00,
+                quantity: 5
+            }
+            const items: CartItem[] = [bread, paper];
+            const subtotal = calculateSubtotal(items);
+            expect(subtotal).toEqual(0.00)
+        })
+        it('should calculate very large values', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: 1000.00,
+                quantity: 200
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 20000.00,
+                quantity: 350
+            }
+            const items: CartItem[] = [bread, paper];
+            const subtotal = calculateSubtotal(items);
+            expect(subtotal).toBeCloseTo(7200000.00)
+        })
+        it('should handle when one price is a negative value', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: -5.78,
+                quantity: 2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 7.25,
+                quantity: 5
+            }
+            const items: CartItem[] = [bread, paper];
+            const subtotal = calculateSubtotal(items);
+            expect(subtotal).toBeCloseTo(24.69)
+        })
+        it('should handle when prices are negative values', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: -5.78,
+                quantity: 2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: -7.25,
+                quantity: 5
+            }
+            const items: CartItem[] = [bread, paper];
+            const subtotal = calculateSubtotal(items);
+            expect(subtotal).toBeCloseTo(-47.81)
+        })
     });
 });
+
