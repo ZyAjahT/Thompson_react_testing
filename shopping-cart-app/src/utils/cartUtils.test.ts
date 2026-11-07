@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {calculateItemTotal, type CartItem, calculateSubtotal, isValidQuantity, calculateDiscount, calculateTax, formatCurrency } from '../utils/cartUtils'
+import {calculateItemTotal, type CartItem, calculateSubtotal, isValidQuantity, calculateDiscount, calculateTax, formatCurrency, calculateTotal } from '../utils/cartUtils'
 
 describe('calculateItemTotal', () => {
     // Normal Cases 
@@ -608,11 +608,8 @@ describe('calculateTotal', () => {
                 quantity: 5
             }
             const items: CartItem[] = [bread, paper]
-            const subtotal = calculateSubtotal(items)
-            const discount = calculateDiscount(subtotal)
-            const afterDiscount = subtotal - discount
-            const tax = calculateTax(afterDiscount)
-            expect(afterDiscount + tax).toBeCloseTo(133.95132)
+            const total = calculateTotal(items) 
+            expect(total).toBeCloseTo(133.95132)
         })
         it('should calculate total price with 5% discount', () => {
             const bread: CartItem = {
@@ -628,11 +625,8 @@ describe('calculateTotal', () => {
                 quantity: 3
             }
             const items: CartItem[] = [bread, paper]
-            const subtotal = calculateSubtotal(items)
-            const discount = calculateDiscount(subtotal)
-            const afterDiscount = subtotal - discount
-            const tax = calculateTax(afterDiscount)
-            expect(afterDiscount + tax).toBeCloseTo(54.69606) 
+            const total = calculateTotal(items)
+            expect(total).toBeCloseTo(54.69606) 
         })
         it('should calculate total price with no discount', () => {
             const bread: CartItem = {
@@ -648,11 +642,8 @@ describe('calculateTotal', () => {
                 quantity: 5
             }
             const items: CartItem[] = [bread, paper]
-            const subtotal = calculateSubtotal(items)
-            const discount = calculateDiscount(subtotal)
-            const afterDiscount = subtotal - discount
-            const tax = calculateTax(afterDiscount)
-            expect(afterDiscount + tax).toBeCloseTo(51.6348)
+            const total = calculateTotal(items)
+            expect(total).toBeCloseTo(51.6348)
         })
     });
     describe('Edge Cases', () => {
@@ -670,11 +661,8 @@ describe('calculateTotal', () => {
                 quantity: 5
             }
             const items: CartItem[] = [bread, paper]
-            const subtotal = calculateSubtotal(items)
-            const discount = calculateDiscount(subtotal)
-            const afterDiscount = subtotal - discount
-            const tax = calculateTax(afterDiscount)
-            expect(afterDiscount + tax).toBeCloseTo(39.15)
+            const total = calculateTotal(items)
+            expect(total).toBeCloseTo(39.15)
         })
         it('should calculate total price is negative', () => {
             const bread: CartItem = {
@@ -690,11 +678,8 @@ describe('calculateTotal', () => {
                 quantity: 5
             }
             const items: CartItem[] = [bread, paper]
-            const subtotal = calculateSubtotal(items)
-            const discount = calculateDiscount(subtotal)
-            const afterDiscount = subtotal - discount
-            const tax = calculateTax(afterDiscount)
-            expect(afterDiscount + tax).toBeCloseTo(26.6652)
+            const total = calculateTotal(items)
+            expect(total).toBeCloseTo(26.6652)
         })
         it('should calculate very large numbers', () => {
             const bread: CartItem = {
@@ -710,11 +695,8 @@ describe('calculateTotal', () => {
                 quantity: 1000
             }
             const items: CartItem[] = [bread, paper]
-            const subtotal = calculateSubtotal(items)
-            const discount = calculateDiscount(subtotal)
-            const afterDiscount = subtotal - discount
-            const tax = calculateTax(afterDiscount)
-            expect(afterDiscount + tax).toBeCloseTo(1246969.08)
+            const total = calculateTotal(items)
+            expect(total).toBeCloseTo(1246969.08)
         })
     });
 });
@@ -735,11 +717,7 @@ describe('formatCurrency', () => {
                 quantity: 5
             }
             const items: CartItem[] = [bread, paper]
-            const subtotal = calculateSubtotal(items)
-            const discount = calculateDiscount(subtotal)
-            const afterDiscount = subtotal - discount
-            const tax = calculateTax(afterDiscount)
-            const total = afterDiscount + tax
+            const total = calculateTotal(items)
             expect(formatCurrency(total)).toBe('$133.95')
         })
     });
@@ -758,11 +736,7 @@ describe('formatCurrency', () => {
                 quantity: 5
             }
             const items: CartItem[] = [bread, paper]
-            const subtotal = calculateSubtotal(items)
-            const discount = calculateDiscount(subtotal)
-            const afterDiscount = subtotal - discount
-            const tax = calculateTax(afterDiscount)
-            const total = afterDiscount + tax
+            const total = calculateTotal(items)
             expect(formatCurrency(total)).toBe('$0.00')
         })
         it('should correctly format currency if the total is a negative', () => {
@@ -779,11 +753,7 @@ describe('formatCurrency', () => {
                 quantity: 5
             }
             const items: CartItem[] = [bread, paper]
-            const subtotal = calculateSubtotal(items)
-            const discount = calculateDiscount(subtotal)
-            const afterDiscount = subtotal - discount
-            const tax = calculateTax(afterDiscount)
-            const total = afterDiscount + tax
+            const total = calculateTotal(items)
             expect(formatCurrency(total)).toBe('$-51.63')
         })
         it('should format very large numbers', () => {
@@ -800,12 +770,47 @@ describe('formatCurrency', () => {
                 quantity: 1000
             }
             const items: CartItem[] = [bread, paper]
-            const subtotal = calculateSubtotal(items)
-            const discount = calculateDiscount(subtotal)
-            const afterDiscount = subtotal - discount
-            const tax = calculateTax(afterDiscount)
-            const total = afterDiscount + tax
+            const total = calculateTotal(items)
             expect(formatCurrency(total)).toBe('$1246969.08')
+        })
+    });
+});
+
+describe('isValidQuantity', () => {
+    describe('Normal Cases', () => {
+        it('should vaildate one item quantity is a positive integer', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: 5.78,
+                quantity: -2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 7.25,
+                quantity: 5
+            }
+            expect(isValidQuantity(bread.quantity)).toBe(false)
+            expect(isValidQuantity(paper.quantity)).toBe(true)
+        })
+    });
+    describe('Edge Cases', () => {
+        it('should vaildate if both items are a vaild quantity', () => {
+            const bread: CartItem = {
+                id: 1,
+                name: 'Bread',
+                price: 5.78,
+                quantity: -2
+            }
+            const paper: CartItem = {
+                id: 2,
+                name: 'Paper',
+                price: 7.25,
+                quantity: -5
+            }
+            expect(isValidQuantity(bread.quantity)).toBe(false)
+            expect(isValidQuantity(paper.quantity)).toBe(false) 
         })
     });
 });
